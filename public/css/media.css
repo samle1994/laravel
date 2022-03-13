@@ -1,0 +1,13 @@
+@media (max-width: 767px) {
+  #header .logo {
+    margin-bottom: 1rem;
+  }
+  #menu ul li {
+    padding-right: 0.5rem;
+  }
+}
+@media (max-width: 575px) {
+  #footer .img_footer {
+    margin-bottom: 1rem;
+  }
+}

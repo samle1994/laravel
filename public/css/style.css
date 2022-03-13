@@ -1,0 +1,52 @@
+#header {
+    background-color: #333;
+}
+a {
+    text-decoration: none;
+}
+.text-warning-c {
+    color: #ff9900;
+}
+#menu {
+    width: 100%;
+    background: #232323;
+}
+#menu ul {
+    padding-left: 0;
+    margin-bottom: 0;
+}
+#menu ul li {
+    list-style: none;
+    padding-right: 2rem;
+}
+#menu ul li a {
+    color: #a2bab6;
+    text-transform: uppercase;
+    text-decoration: none;
+}
+/* About */
+.about .des-about {
+    background-color: #464646;
+}
+/* main */
+.line-main {
+    border-top: 1px solid #ccc;
+}
+.about .des-about p {
+    overflow: hidden;
+}
+/* Footer */
+#footer .col-footer ul {
+    padding-left: 0;
+}
+#footer .col-footer ul li {
+    list-style: none;
+    padding: 7px 0;
+    border-bottom: 1px solid #ccc;
+}
+#footer .col-footer ul li:last-child {
+    border: 0;
+}
+#footer .copyright {
+    background-color: #232323;
+}
