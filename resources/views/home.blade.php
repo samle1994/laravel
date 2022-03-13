@@ -8,8 +8,7 @@
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('css/media.css') }}">
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.css') }}">
-
+   
 </head>
 
 <body>
