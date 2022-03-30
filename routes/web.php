@@ -15,7 +15,6 @@ use Illuminate\Http\Request;
 
 
 Route::prefix('/')->group(function () {
-    
         
         //Route::get('/','App\Http\Controllers\HomeController@index');
         
