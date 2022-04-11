@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Http\Controllers\HomeController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -17,9 +18,6 @@ use Illuminate\Http\Request;
 Route::prefix('/')->group(function () {
         
         //Route::get('/','App\Http\Controllers\HomeController@index');
-        
-        Route::get('/', 'App\Http\Controllers\HomeController@index');
-        Route::get('home', function () {
-            return view('home');
-        })->name('home');
+        Route::get('/', [HomeController::class,'index']);
+       
 });

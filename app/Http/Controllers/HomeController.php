@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use DB;
+
 class HomeController extends Controller
 {
     /**
@@ -21,8 +23,12 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
+    public $data = [];
     public function index()
     {
+        $user=DB::select('select * from products');
+        dd($user);   
         return view('home');
     }
+        
 }
