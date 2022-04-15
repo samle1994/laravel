@@ -21,7 +21,7 @@ class RegisterController extends Controller
                 'errorCode'=>0,
                 'data'=>$userCreate,
                 'status'=>200
-            ]
+            ], 200
         );
     }
 }
