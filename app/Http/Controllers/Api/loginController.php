@@ -13,13 +13,14 @@ class loginController extends Controller
 {
     public function login(request $request) {
         $datalogin=[
-            'email' => $request->email,
+            'username' => $request->username,
             'password' => $request->password,
         ];
         
         if (Auth::attempt($datalogin)) {
             $id = Auth::id();
             $checkTokenExit=SessionUser::where('user_id', $id)->first();
+            $userinfo=User::where('id', $id)->first();
             if(empty($checkTokenExit)) {
                 echo $id;
                 $userSession=SessionUser::create([
@@ -36,7 +37,8 @@ class loginController extends Controller
             return response()->json(
                 [
                     'errorCode'=>0,
-                    'data'=>$userSession,
+                    'data'=>$userinfo,
+                    'token'=>$userSession->token,
                     'status'=>200
                     
                 ], 200
