@@ -47,7 +47,7 @@ class loginController extends Controller
             return response()->json(
                 [
                     'errorCode'=>1,
-                    'message'=>'Password or username wrong !',
+                    'message'=>'Sai mật khẩu hoặc password !',
                     'status'=>401
                 ], 200
             );
