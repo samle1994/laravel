@@ -29,4 +29,10 @@ Route::group(['middleware' => 'Token'], function() {
     Route::get('/products/{id}', 'Api\ProductController@show');
     Route::put('/products/{id}', 'Api\ProductController@update');
     Route::delete('/products/{id}', 'Api\ProductController@destroy');
+
+    Route::get('productlist', 'Api\ProductListController@index');
+    Route::post('productlist', 'Api\ProductListController@store');
+    Route::get('/productlist/{id}', 'Api\ProductListController@show');
+    Route::put('/productlist/{id}', 'Api\ProductListController@update');
+    Route::delete('/productlist/{id}', 'Api\ProductListController@destroy');
 });
