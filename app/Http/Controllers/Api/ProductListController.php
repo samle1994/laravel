@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\ProductList;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use DB;
+use Illuminate\Support\Facades\DB;
 class ProductListController extends Controller
 {
     /**
@@ -15,9 +15,14 @@ class ProductListController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+
+
+    public function index(Request $request)
     {
-        $product_list=DB::select('select * from product_list');
+
+        $page= $request->input('page');
+        $pageLength= $request->input('pageLength');
+        $product_list=DB::table('product_list')->paginate($pageLength);
         return response()->json(
             [
                 'errorCode'=>0,
@@ -109,7 +114,48 @@ class ProductListController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+
+        $data = $request->all();
+
+        $validator = Validator::make($data, [
+            'name'=>'required',
+        ]);
+
+        if ($validator->fails()) {
+  
+            return response()->json(
+                [
+                    'errorCode'=>1,
+                    'message'=>'Tên không được rỗng',
+                    'status'=>401
+                    
+                ], 201
+            );
+        }
+        $request->slug= Str::slug($request->name , "-");
+         $productUpdate=ProductList::where('id',$id)
+        ->update([
+            'name' => $request->name,
+            'slug' => $request->slug
+        ]);
+       
+        if($productUpdate) {
+            return response()->json(
+                [
+                    'errorCode'=>0,
+                    'data'=>$productUpdate,
+                    'status'=>200,
+                ], 200
+            );
+        } else {
+            return response()->json(
+                [
+                    'errorCode'=>1,
+                    'message'=>'Update fail',
+                    'status'=>401,
+                ], 200
+            );
+        }
     }
 
     /**
@@ -120,6 +166,24 @@ class ProductListController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $deleted = ProductList::where('id', $id)->delete();
+
+        if($deleted) {
+            return response()->json(
+                [
+                    'errorCode'=>0,
+                    'data'=>$deleted,
+                    'status'=>200,
+                ], 200
+            );
+        } else {
+            return response()->json(
+                [
+                    'errorCode'=>1,
+                    'message'=>'Delete fail',
+                    'status'=>401,
+                ], 200
+            );
+        }
     }
 }

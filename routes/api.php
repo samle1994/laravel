@@ -30,7 +30,7 @@ Route::group(['middleware' => 'Token'], function() {
     Route::put('/products/{id}', 'Api\ProductController@update');
     Route::delete('/products/{id}', 'Api\ProductController@destroy');
 
-    Route::get('productlist', 'Api\ProductListController@index');
+    Route::get('productlist/paging', 'Api\ProductListController@index');
     Route::post('productlist', 'Api\ProductListController@store');
     Route::get('/productlist/{id}', 'Api\ProductListController@show');
     Route::put('/productlist/{id}', 'Api\ProductListController@update');
