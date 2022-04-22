@@ -4,19 +4,18 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\ProductList;
+use App\Models\ProductCat;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-class ProductListController extends Controller
+
+class ProductCatController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-
-
     public function index(Request $request)
     {
         $searchTerm= $request->input('keyword');
@@ -27,43 +26,27 @@ class ProductListController extends Controller
 
         $page= $request->input('page');
         $pageLength= $request->input('pageLength');
-
-        if($page) {
-            $product_list=DB::table('product_list')->where(function ($q) use ($searchValues) {
-                foreach ($searchValues as $value) {
-                $q->orWhere('name', 'like', "%{$value}%");
-                }
-            })->offset($page*$pageLength)->take($pageLength)->get();
-            $pageInfo=DB::table('product_list')->where(function ($q) use ($searchValues) {
-                foreach ($searchValues as $value) {
-                $q->orWhere('name', 'like', "%{$value}%");
-                }
-            })->paginate($pageLength);
-
-            return response()->json(
-                [
-                    'errorCode'=>0,
-                    'data'=>$product_list,
-                    'PageInfo'=>[
-                        'total'=>$pageInfo->lastpage()
-                    ],
-                    'status'=>200
-                ], 200
-            );
-        } else {
-            $product_list= DB::table('product_list')->get();
-            return response()->json(
-                [
-                    'errorCode'=>0,
-                    'data'=>$product_list,
-                    'status'=>200
-                ], 200
-            );
-        }
-       
-
+        $product_cat=DB::table('product_cat')->where(function ($q) use ($searchValues) {
+            foreach ($searchValues as $value) {
+            $q->orWhere('name', 'like', "%{$value}%");
+            }
+        })->offset($page*$pageLength)->take($pageLength)->get();
+        $pageInfo=DB::table('product_cat')->where(function ($q) use ($searchValues) {
+            foreach ($searchValues as $value) {
+            $q->orWhere('name', 'like', "%{$value}%");
+            }
+        })->paginate($pageLength);
         //dd($pageInfo);
-       
+        return response()->json(
+            [
+                'errorCode'=>0,
+                'data'=>$product_cat,
+                'PageInfo'=>[
+                    'total'=>$pageInfo->lastpage()
+                ],
+                'status'=>200
+            ], 200
+        );
     }
 
     /**
@@ -74,7 +57,6 @@ class ProductListController extends Controller
      */
     public function store(Request $request)
     {
-
         $data = $request->all();
 
         $validator = Validator::make($data, [
@@ -93,9 +75,10 @@ class ProductListController extends Controller
             );
         }
             $request->slug= Str::slug($request->name , "-");
-            $product=ProductList::create([
+            $product=ProductCat::create([
                 'name' => $request->name,
                 'type' => 'product',
+                'id_list' => $request->id_list,
                 'slug' => $request->slug
             ]
             );
@@ -107,7 +90,6 @@ class ProductListController extends Controller
                     'status'=>200,
                 ], 200
             );
-    
     }
 
     /**
@@ -118,7 +100,7 @@ class ProductListController extends Controller
      */
     public function show($id)
     {
-        $productDetail=ProductList::where('id', $id)->first();
+        $productDetail=ProductCat::where('id', $id)->first();
         if(empty($productDetail)) {
             return response()->json(
                 [
@@ -147,13 +129,12 @@ class ProductListController extends Controller
      */
     public function update(Request $request, $id)
     {
-   
         $value= $request->input('value');
         $type= $request->input('type');
      
         if($value!='' && $type!='') {
 
-            $productUpdate=ProductList::where('id',$id)
+            $productUpdate=ProductCat::where('id',$id)
             ->update([
                 $type => $value
             ]);
@@ -178,10 +159,11 @@ class ProductListController extends Controller
             );
         }
         $request->slug= Str::slug($request->name , "-");
-         $productUpdate=ProductList::where('id',$id)
+         $productUpdate=ProductCat::where('id',$id)
         ->update([
             'name' => $request->name,
-            'slug' => $request->slug
+            'slug' => $request->slug,
+            'id_list' => $request->id_list,
         ]);
          }
          if($productUpdate) {
@@ -211,7 +193,7 @@ class ProductListController extends Controller
      */
     public function destroy($id)
     {
-        $deleted = ProductList::where('id', $id)->delete();
+        $deleted = ProductCat::where('id', $id)->delete();
 
         if($deleted) {
             return response()->json(
