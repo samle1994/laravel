@@ -25,15 +25,16 @@ class ProductListController extends Controller
 
         $searchValues = preg_split('/\s+/', $searchTerm, -1, PREG_SPLIT_NO_EMPTY);
 
-        $page= $request->input('page');
+       $page= $request->input('page');
         $pageLength= $request->input('pageLength');
 
-        if($page) {
+        if($page!='') {
             $product_list=DB::table('product_list')->where(function ($q) use ($searchValues) {
                 foreach ($searchValues as $value) {
                 $q->orWhere('name', 'like', "%{$value}%");
                 }
             })->offset($page*$pageLength)->take($pageLength)->get();
+            
             $pageInfo=DB::table('product_list')->where(function ($q) use ($searchValues) {
                 foreach ($searchValues as $value) {
                 $q->orWhere('name', 'like', "%{$value}%");

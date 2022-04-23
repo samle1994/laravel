@@ -17,4 +17,9 @@ class ProductList extends Model
         'created_at',
         'updated_at',
     ];
+
+    public function ProductCat()
+    {
+        return $this->hasMany('App\Models\ProductCat', 'id_list');
+    }
 }

@@ -17,13 +17,33 @@ class ProductController extends Controller
      */
     public function index(Request $request )
     {
-        $product=DB::select('select * from products');
+        $searchTerm= $request->input('keyword');
+        $reservedSymbols = ['-', '+', '<', '>', '@', '(', ')', '~'];
+        $searchTerm = str_replace($reservedSymbols, ' ', $searchTerm);
+
+        $searchValues = preg_split('/\s+/', $searchTerm, -1, PREG_SPLIT_NO_EMPTY);
+
+        $page= $request->input('page');
+        $pageLength= $request->input('pageLength');
+        $product_cat=Products::with('productList')->where(function ($q) use ($searchValues) {
+            foreach ($searchValues as $value) {
+            $q->orWhere('name', 'like', "%{$value}%");
+            }
+        })->offset($page*$pageLength)->take($pageLength)->get();
+        $pageInfo=DB::table('product')->where(function ($q) use ($searchValues) {
+            foreach ($searchValues as $value) {
+            $q->orWhere('name', 'like', "%{$value}%");
+            }
+        })->paginate($pageLength);
+        //dd($pageInfo);
         return response()->json(
             [
                 'errorCode'=>0,
-                'data'=>$product,
+                'data'=>$product_cat,
+                'PageInfo'=>[
+                    'total'=>$pageInfo->lastpage()
+                ],
                 'status'=>200
-                
             ], 200
         );
     }

@@ -8,6 +8,7 @@ use App\Models\ProductCat;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use App\Models\ProductList;
 
 class ProductCatController extends Controller
 {
@@ -26,7 +27,7 @@ class ProductCatController extends Controller
 
         $page= $request->input('page');
         $pageLength= $request->input('pageLength');
-        $product_cat=DB::table('product_cat')->where(function ($q) use ($searchValues) {
+        $product_cat=ProductCat::with('productList')->where(function ($q) use ($searchValues) {
             foreach ($searchValues as $value) {
             $q->orWhere('name', 'like', "%{$value}%");
             }
@@ -101,6 +102,10 @@ class ProductCatController extends Controller
     public function show($id)
     {
         $productDetail=ProductCat::where('id', $id)->first();
+
+        //$productDetail=ProductCat::with('productList')->where('id', $id)->first();
+       
+       //dd($productDetail);
         if(empty($productDetail)) {
             return response()->json(
                 [

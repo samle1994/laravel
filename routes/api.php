@@ -24,11 +24,12 @@ Route::post('register', 'Api\RegisterController@register');
 Route::post('login', 'Api\loginController@login');
 
 Route::group(['middleware' => 'Token'], function() {
-    Route::get('products', 'Api\ProductController@index');
-    Route::post('products', 'Api\ProductController@store');
-    Route::get('/products/{id}', 'Api\ProductController@show');
-    Route::put('/products/{id}', 'Api\ProductController@update');
-    Route::delete('/products/{id}', 'Api\ProductController@destroy');
+    Route::get('product/paging', 'Api\ProductController@index');
+    Route::post('product', 'Api\ProductController@store');
+    Route::get('/product/{id}', 'Api\ProductController@show');
+    Route::put('/product/{id}', 'Api\ProductController@update');
+    Route::delete('/product/{id}', 'Api\ProductController@destroy');
+    Route::get('/getproductcat/{id}', 'Api\GetProductCatController@show');
 
     Route::get('productlist/paging', 'Api\ProductListController@index');
     Route::post('productlist', 'Api\ProductListController@store');
