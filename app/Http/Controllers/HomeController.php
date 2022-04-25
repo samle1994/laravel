@@ -26,7 +26,7 @@ class HomeController extends Controller
     public $data = [];
     public function index()
     {
-        $user=DB::select('select * from products');
+        $user=DB::select('select * from product');
         dd($user);   
         return view('home');
     }

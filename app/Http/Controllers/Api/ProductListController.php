@@ -62,7 +62,6 @@ class ProductListController extends Controller
             );
         }
        
-
         //dd($pageInfo);
        
     }

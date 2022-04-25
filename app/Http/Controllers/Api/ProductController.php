@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Products;
+use App\Models\Gallery;
 use App\Models\SessionUser;
-
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use DB;
 class ProductController extends Controller
 {
@@ -56,27 +58,69 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        if(empty($request->name)) {
+        $data = $request->all();
+
+        if($request->hasfile('photo')) 
+        { 
+        $file = $request->file('photo');
+        $extension = $file->getClientOriginalExtension(); // getting image extension
+        $filename =time().'.'.$extension;
+        $file->move('uploads/product/', $filename);
+        } else {
+            $filename='';
+        }
+
+        $validator = Validator::make($data, [
+            'name'=>'required',
+        ]);
+
+        if ($validator->fails()) {
+  
             return response()->json(
                 [
                     'errorCode'=>1,
-                    'message'=>'Name not null',
+                    'message'=>'Tên không được rỗng',
                     'status'=>401
                     
-                ], 2010
+                ], 201
+            );
+        }
+            $request->slug= Str::slug($request->name , "-");
+            
+            $product=Products::create([
+                'name' => $request->name,
+                'type' => 'product',
+                'id_list' => $request->id_list,
+                'id_cat' => $request->id_cat,
+                'photo' => $filename,
+                'price' => $request->price,
+                'description' => $request->description,
+                'content' => $request->content,
+                'slug' => $request->slug
+            ]
             );
 
-        } elseif(empty($request->type)) {
-            return response()->json(
-                [
-                    'errorCode'=>0,
-                    'message'=>'Type not null',
-                    'status'=>401
-                    
-                ], 200
-            );
-        } else {
-            $product=Products::create($request->all());
+            if($request->hasFile('files'))
+            {
+                $filename='';
+                $files=$request->file('files');
+                $dataFile=array();
+                foreach($files as $image)
+                {
+                    $destinationPath = 'uploads/gallery/';   
+                    $extension = $image->getClientOriginalExtension(); // getting image extension
+                    $filename =time().'.'.$extension;
+                    $image->move($destinationPath, $filename);
+                    $data=[
+                        'type' => 'product',
+                        'id_list' => $product['id'],
+                        'photo' => $filename
+                    ];
+                    array_push($dataFile,$data);
+                }  
+                $Gallery=Gallery::insert($dataFile);
+            }
+
             return response()->json(
                 [
                     'errorCode'=>0,
@@ -84,7 +128,6 @@ class ProductController extends Controller
                     'status'=>200,
                 ], 200
             );
-        }
     }
 
     /**
