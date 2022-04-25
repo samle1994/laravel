@@ -86,7 +86,7 @@ class ProductController extends Controller
             );
         }
             $request->slug= Str::slug($request->name , "-");
-            
+            //dd($request);
             $product=Products::create([
                 'name' => $request->name,
                 'type' => 'product',
@@ -168,10 +168,82 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
  
-        $productUpdate=Products::where('id',$id)
-        ->update($request->all());
-       
-        if($productUpdate) {
+        $value= $request->input('value');
+        $type= $request->input('type');
+     
+        if($value!='' && $type!='') {
+
+            $productUpdate=Products::where('id',$id)
+            ->update([
+                $type => $value
+            ]);
+        
+        } else {
+            
+                $data = $request->all();
+
+                $validator = Validator::make($data, [
+                    'name'=>'required',
+                ]);
+
+                if ($validator->fails()) {
+        
+                    return response()->json(
+                        [
+                            'errorCode'=>1,
+                            'message'=>'Tên không được rỗng',
+                            'status'=>401
+                            
+                        ], 201
+                    );
+                }
+
+                if($request->hasfile('photo')) 
+                { 
+                $file = $request->file('photo');
+                $extension = $file->getClientOriginalExtension(); // getting image extension
+                $filename =time().'.'.$extension;
+                $file->move('uploads/product/', $filename);
+                } else {
+                    $filename='';
+                }
+                
+                $request->slug= Str::slug($request->name , "-");
+             
+                $productUpdate=Products::where('id',$id)
+                ->update([
+                    'name' => $request->name,
+                    'id_list' => $request->id_list,
+                    'id_cat' => $request->id_cat,
+                    'photo' => $filename,
+                    'price' => $request->price,
+                    'description' => $request->description,
+                    'content' => $request->content,
+                    'slug' => $request->slug
+                ]);
+
+                if($request->hasFile('files'))
+                {
+                    $filename='';
+                    $files=$request->file('files');
+                    $dataFile=array();
+                    foreach($files as $image)
+                    {
+                        $destinationPath = 'uploads/gallery/';   
+                        $extension = $image->getClientOriginalExtension(); // getting image extension
+                        $filename =time().'.'.$extension;
+                        $image->move($destinationPath, $filename);
+                        $data=[
+                            'type' => 'product',
+                            'id_list' => $id,
+                            'photo' => $filename
+                        ];
+                        array_push($dataFile,$data);
+                    }  
+                    $Gallery=Gallery::insert($dataFile);
+                }
+         }
+         if($productUpdate) {
             return response()->json(
                 [
                     'errorCode'=>0,

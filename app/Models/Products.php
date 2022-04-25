@@ -20,6 +20,8 @@ class Products extends Model
         'description',
         'content',
         'price',
+        'id_list',
+        'id_cat',
         'created_at',
         'updated_at',
     ];

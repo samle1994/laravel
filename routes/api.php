@@ -27,7 +27,7 @@ Route::group(['middleware' => 'Token'], function() {
     Route::get('product/paging', 'Api\ProductController@index');
     Route::post('product', 'Api\ProductController@store');
     Route::get('/product/{id}', 'Api\ProductController@show');
-    Route::put('/product/{id}', 'Api\ProductController@update');
+    Route::post('/product/{id}', 'Api\ProductController@update');
     Route::delete('/product/{id}', 'Api\ProductController@destroy');
     Route::get('/getproductcat/{id}', 'Api\GetProductCatController@show');
 
