@@ -31,4 +31,8 @@ class Products extends Model
     public function productCat() {
         return $this->belongsTo('App\Models\ProductCat', 'id_cat');
     }
+    public function files()
+    {
+        return $this->hasMany('App\Models\Gallery', 'id_list');
+    }
 }

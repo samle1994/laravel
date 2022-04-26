@@ -9,6 +9,7 @@ use App\Models\Gallery;
 use App\Models\SessionUser;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\URL;
 use DB;
 class ProductController extends Controller
 {
@@ -27,21 +28,39 @@ class ProductController extends Controller
 
         $page= $request->input('page');
         $pageLength= $request->input('pageLength');
-        $product_cat=Products::with('productList')->where(function ($q) use ($searchValues) {
+        $product=Products::with('productList','productCat')->where(function ($q) use ($searchValues) {
             foreach ($searchValues as $value) {
             $q->orWhere('name', 'like', "%{$value}%");
             }
-        })->offset($page*$pageLength)->take($pageLength)->get();
+        })->orderBy('id', 'DESC')->offset($page*$pageLength)->take($pageLength)->get();
         $pageInfo=DB::table('product')->where(function ($q) use ($searchValues) {
             foreach ($searchValues as $value) {
             $q->orWhere('name', 'like', "%{$value}%");
             }
         })->paginate($pageLength);
-        //dd($pageInfo);
+        
+        $data=array();
+        foreach($product as $pro) {
+            
+            $data_array=[
+            'id'=>$pro->id, 
+            'name'=>$pro->name,
+            'price'=>$pro->price,
+            'id_list'=>$pro->id_list,
+            'id_cat'=>$pro->id_cat,
+            'product_cat'=>$pro->productCat,
+            'product_list'=>$pro->productList,
+            'is_status'=>$pro->is_status,
+            'hot'=>$pro->hot,
+            'photo'=>URL::to('/').'/uploads/product/'.$pro->photo,
+            ];
+            array_push($data,$data_array);
+        }
+        //dd($product);
         return response()->json(
             [
                 'errorCode'=>0,
-                'data'=>$product_cat,
+                'data'=>$data,
                 'PageInfo'=>[
                     'total'=>$pageInfo->lastpage()
                 ],
@@ -99,17 +118,16 @@ class ProductController extends Controller
                 'slug' => $request->slug
             ]
             );
-
-            if($request->hasFile('files'))
-            {
+            if($request->file('files')) {
                 $filename='';
-                $files=$request->file('files');
                 $dataFile=array();
+                $destinationPath = 'uploads/gallery/';  
+                $files=$request->file('files');
                 foreach($files as $image)
-                {
-                    $destinationPath = 'uploads/gallery/';   
+                { 
                     $extension = $image->getClientOriginalExtension(); // getting image extension
-                    $filename =time().'.'.$extension;
+                    $name=Str::slug($image->getClientOriginalName(), "-");
+                    $filename =$name.'-'.time().'.'.$extension;
                     $image->move($destinationPath, $filename);
                     $data=[
                         'type' => 'product',
@@ -119,8 +137,8 @@ class ProductController extends Controller
                     array_push($dataFile,$data);
                 }  
                 $Gallery=Gallery::insert($dataFile);
-            }
-
+            }            
+        if(!empty($product)) {
             return response()->json(
                 [
                     'errorCode'=>0,
@@ -128,6 +146,16 @@ class ProductController extends Controller
                     'status'=>200,
                 ], 200
             );
+        } else {
+            return response()->json(
+                [
+                    'errorCode'=>1,
+                    'message'=>'Có lỗi xảy ra',
+                    'status'=>401
+                    
+                ], 201
+            );
+        }
     }
 
     /**
@@ -138,7 +166,7 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        $productDetail=Products::where('id', $id)->first();
+        $productDetail=Products::with('files')->where('id', $id)->first();
         if(empty($productDetail)) {
             return response()->json(
                 [
@@ -148,10 +176,36 @@ class ProductController extends Controller
                 ], 200
             );
         } else {
+            $photo=array();
+            $photos=$productDetail->files;
+            foreach( $photos as $file) {
+                $data=[
+                    'id'=>$file->id,      
+                    'photo'=>URL::to('/').'/uploads/gallery/'.$file->photo, 
+                ]; 
+                array_push($photo,$data);
+            }
+            //dd($photo);
+            if($productDetail->photo!='') {
+                $photo_detail=URL::to('/').'/uploads/product/'.$productDetail->photo;
+            }
+            else {
+                $photo_detail='';
+            }
             return response()->json(
                 [
                     'errorCode'=>0,
-                    'data'=>$productDetail,
+                    'data'=>[
+                        'id'=>$productDetail->id, 
+                        'name'=>$productDetail->name,
+                        'photo'=>$photo_detail,
+                        'price'=>$productDetail->price,
+                        'id_list'=>$productDetail->id_list,
+                        'id_cat'=>$productDetail->id_cat,
+                        'content'=>$productDetail->content,
+                        'description'=>$productDetail->description,
+                        'files'=>$photo,
+                    ],
                     'status'=>200,
                 ], 200
             );
@@ -197,16 +251,6 @@ class ProductController extends Controller
                         ], 201
                     );
                 }
-
-                if($request->hasfile('photo')) 
-                { 
-                $file = $request->file('photo');
-                $extension = $file->getClientOriginalExtension(); // getting image extension
-                $filename =time().'.'.$extension;
-                $file->move('uploads/product/', $filename);
-                } else {
-                    $filename='';
-                }
                 
                 $request->slug= Str::slug($request->name , "-");
              
@@ -215,23 +259,35 @@ class ProductController extends Controller
                     'name' => $request->name,
                     'id_list' => $request->id_list,
                     'id_cat' => $request->id_cat,
-                    'photo' => $filename,
                     'price' => $request->price,
                     'description' => $request->description,
                     'content' => $request->content,
                     'slug' => $request->slug
                 ]);
 
-                if($request->hasFile('files'))
-                {
+                if($request->hasfile('photo')) 
+                { 
+                    $file = $request->file('photo');
+                    $extension = $file->getClientOriginalExtension(); // getting image extension
+                    $filename =time().'.'.$extension;
+                    $file->move('uploads/product/', $filename);
+
+                    Products::where('id',$id)
+                    ->update([
+                        'photo' => $filename,
+                    ]);
+                    //dd($productUpdate);
+                } 
+                if($request->file('files')) {
                     $filename='';
-                    $files=$request->file('files');
                     $dataFile=array();
+                    $destinationPath = 'uploads/gallery/';  
+                    $files=$request->file('files');
                     foreach($files as $image)
-                    {
-                        $destinationPath = 'uploads/gallery/';   
+                    { 
                         $extension = $image->getClientOriginalExtension(); // getting image extension
-                        $filename =time().'.'.$extension;
+                        $name=Str::slug($image->getClientOriginalName(), "-");
+                        $filename =$name.'-'.time().'.'.$extension;
                         $image->move($destinationPath, $filename);
                         $data=[
                             'type' => 'product',
@@ -241,7 +297,7 @@ class ProductController extends Controller
                         array_push($dataFile,$data);
                     }  
                     $Gallery=Gallery::insert($dataFile);
-                }
+                }    
          }
          if($productUpdate) {
             return response()->json(
@@ -272,6 +328,13 @@ class ProductController extends Controller
     {
         $deleted = Products::where('id', $id)->delete();
 
+        $gallery=Gallery::where('id_list', $id)->get();
+
+        foreach ($gallery as $key => $value) {
+            @unlink('uploads/gallery/'.$value['photo']);
+        }
+        Gallery::where('id_list', $id)->delete();
+    
         if($deleted) {
             return response()->json(
                 [
