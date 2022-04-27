@@ -326,7 +326,9 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
+        $deleted_detail = Products::where('id', $id)->first();
         $deleted = Products::where('id', $id)->delete();
+        @unlink('uploads/product/'.$deleted_detail['photo']);
 
         $gallery=Gallery::where('id_list', $id)->get();
 

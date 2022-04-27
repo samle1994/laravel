@@ -43,4 +43,17 @@ Route::group(['middleware' => 'Token'], function() {
     Route::get('/productcat/{id}', 'Api\ProductCatController@show');
     Route::put('/productcat/{id}', 'Api\ProductCatController@update');
     Route::delete('/productcat/{id}', 'Api\ProductCatController@destroy');
+
+    Route::get('news/paging', 'Api\NewsController@index');
+    Route::post('news', 'Api\NewsController@store');
+    Route::get('news/{id}', 'Api\NewsController@show');
+    Route::post('news/{id}', 'Api\NewsController@update');
+    Route::delete('news/{id}', 'Api\NewsController@destroy');
+
+    Route::get('setting/{id}', 'Api\SettingController@show');
+    Route::put('setting/{id}', 'Api\SettingController@update');
+
+    Route::get('photo/{id}', 'Api\PhotoStaticController@show');
+    Route::post('photo/{id}', 'Api\PhotoStaticController@update');
+
 });
