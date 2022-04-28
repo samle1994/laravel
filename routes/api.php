@@ -56,4 +56,10 @@ Route::group(['middleware' => 'Token'], function() {
     Route::get('photo/{id}', 'Api\PhotoStaticController@show');
     Route::post('photo/{id}', 'Api\PhotoStaticController@update');
 
+    Route::get('photos/paging', 'Api\PhotoController@index');
+    Route::post('photos', 'Api\PhotoController@store');
+    Route::get('photos/{id}', 'Api\PhotoController@show');
+    Route::post('photos/{id}', 'Api\PhotoController@update');
+    Route::delete('photos/{id}', 'Api\PhotoController@destroy');
+
 });
