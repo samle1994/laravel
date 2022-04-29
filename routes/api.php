@@ -63,3 +63,15 @@ Route::group(['middleware' => 'Token'], function() {
     Route::delete('photos/{id}', 'Api\PhotoController@destroy');
 
 });
+
+Route::group(['prefix'=>'/Frontend'],function(){
+    Route::get('photo/{id}', 'Api\ShowPhotoController@show');
+    Route::get('photos/{id}', 'Api\ShowPhotosController@show');
+    Route::get('search/paging', 'Api\SearchProductController@index');
+    Route::get('productnews/paging', 'Api\ProductNewsController@index');
+    Route::get('productsale/paging', 'Api\ProductSaleController@index');
+    Route::get('producthot/paging', 'Api\ProductHotController@index');
+    Route::get('product/paging', 'Api\ShowProductController@index');
+    Route::get('productdetail/{id}', 'Api\ShowProductDetailController@show');
+    Route::get('showinfo', 'Api\ShowInfoController@index');
+});

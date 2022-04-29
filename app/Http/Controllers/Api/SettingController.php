@@ -8,7 +8,7 @@ use App\Models\Setting;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
-use DN;
+use DB;
 
 class SettingController extends Controller
 {

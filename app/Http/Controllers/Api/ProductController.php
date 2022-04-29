@@ -52,6 +52,8 @@ class ProductController extends Controller
             'product_list'=>$pro->productList,
             'is_status'=>$pro->is_status,
             'hot'=>$pro->hot,
+            'news'=>$pro->news,
+            'sale'=>$pro->sale,
             'photo'=>URL::to('/').'/uploads/product/'.$pro->photo,
             ];
             array_push($data,$data_array);
