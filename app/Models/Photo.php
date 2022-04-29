@@ -15,6 +15,7 @@ class Photo extends Model
         'type',
         'act',
         'link',
+        'is_status',
         'created_at',
         'updated_at',
     ];

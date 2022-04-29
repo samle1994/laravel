@@ -15,9 +15,11 @@ class CreatePhoto extends Migration
     {
         Schema::create('photo', function (Blueprint $table) {
             $table->id();
+            $table->string('name', 255);
             $table->string('photo', 255)->nullable();
             $table->string('type', 255)->nullable();
             $table->string('act', 255)->nullable();
+            $table->integer('is_status')->default(1);
             $table->timestamps();
         });
     }
