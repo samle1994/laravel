@@ -35,8 +35,4 @@ class Products extends Model
     {
         return $this->hasMany('App\Models\Gallery', 'id_list');
     }
-    public function productRelate()
-    {
-        return $this->hasMany('App\Models\Products', 'id_list');
-    }
 }

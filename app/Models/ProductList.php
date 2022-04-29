@@ -22,4 +22,7 @@ class ProductList extends Model
     {
         return $this->hasMany('App\Models\ProductCat', 'id_list');
     }
+    public function products() {
+        return $this->hasMany('App\Models\Products', 'id_list', 'id');
+    }
 }

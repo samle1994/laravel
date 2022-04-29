@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Products;
+use App\Models\News;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
-class ShowProductController extends Controller
+class NewsHotController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -24,33 +24,24 @@ class ShowProductController extends Controller
         $searchValues = preg_split('/\s+/', $searchTerm, -1, PREG_SPLIT_NO_EMPTY);
         $page= $request->input('page');
         $pageLength= $request->input('pageLength');
-        $product=Products::with('productList','productCat')->where(function ($q) use ($searchValues) {
+        $news=News::where(function ($q) use ($searchValues) {
             foreach ($searchValues as $value) {
             $q->orWhere('name', 'like', "%{$value}%");
             }
-        })->where('is_status',1)->orderBy('id', 'DESC')->offset($page*$pageLength)->take($pageLength)->get();
-        $pageInfo=Products::where(function ($q) use ($searchValues) {
+        })->where(['hot'=>1,'is_status'=>1])->orderBy('id', 'DESC')->offset($page*$pageLength)->take($pageLength)->get();
+        $pageInfo=News::where(function ($q) use ($searchValues) {
             foreach ($searchValues as $value) {
             $q->orWhere('name', 'like', "%{$value}%");
             }
-        })->where('is_status',1)->paginate($pageLength);
+        })->where(['hot'=>1,'is_status'=>1])->paginate($pageLength);
         
         $data=array();
-        foreach($product as $pro) {
-            
+        foreach($news as $new) {
             $data_array=[
-            'id'=>$pro->id, 
-            'name'=>$pro->name,
-            'price'=>$pro->price,
-            'id_list'=>$pro->id_list,
-            'id_cat'=>$pro->id_cat,
-            'product_cat'=>$pro->productCat,
-            'product_list'=>$pro->productList,
-            'is_status'=>$pro->is_status,
-            'hot'=>$pro->hot,
-            'news'=>$pro->news,
-            'sale'=>$pro->sale,
-            'photo'=>URL::to('/').'/uploads/product/'.$pro->photo,
+            'id'=>$new->id, 
+            'name'=>$new->name,
+            'is_status'=>$new->is_status,
+            'photo'=>URL::to('/').'/uploads/news/'.$new->photo,
             ];
             array_push($data,$data_array);
         }

@@ -74,4 +74,7 @@ Route::group(['prefix'=>'/Frontend'],function(){
     Route::get('product/paging', 'Api\ShowProductController@index');
     Route::get('productdetail/{id}', 'Api\ShowProductDetailController@show');
     Route::get('showinfo', 'Api\ShowInfoController@index');
+    Route::get('news/paging', 'Api\ShowNewsController@index');
+    Route::get('newsdetail/{id}', 'Api\ShowNewsDetailController@show');
+    Route::get('newshot/paging', 'Api\NewsHotController@index');
 });

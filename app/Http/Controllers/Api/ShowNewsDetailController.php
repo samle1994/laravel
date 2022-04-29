@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Products;
+use App\Models\News;
+use App\Models\SessionUser;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
-
-class ShowProductDetailController extends Controller
+use DB;
+class ShowNewsDetailController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -40,10 +41,14 @@ class ShowProductDetailController extends Controller
      */
     public function show($id)
     {
-        $productDetail=Products::with(['productList.products' => function($q) use($id) {
-            $q->where('id', '<>', $id);
-        }, 'files'])->where(['id'=>$id,'is_status'=>1])->first();
-        if(empty($productDetail)) {
+        $newsDetail=News::where(['id'=>$id,'is_status'=>1])->first();
+        $News=News::where(
+            [
+                ['id','<>',$id],
+                ['is_status','=',1]
+            ]
+        )->get();
+        if(empty($newsDetail)) {
             return response()->json(
                 [
                     'errorCode'=>1,
@@ -52,18 +57,9 @@ class ShowProductDetailController extends Controller
                 ], 200
             );
         } else {
-            $photo=array();
-            $photos=$productDetail->files;
-            foreach( $photos as $file) {
-                $data=[
-                    'id'=>$file->id,      
-                    'photo'=>URL::to('/').'/uploads/gallery/'.$file->photo, 
-                ]; 
-                array_push($photo,$data);
-            }
-            //dd($photo);
-            if($productDetail->photo!='') {
-                $photo_detail=URL::to('/').'/uploads/product/'.$productDetail->photo;
+           
+            if($newsDetail->photo!='') {
+                $photo_detail=URL::to('/').'/uploads/news/'.$newsDetail->photo;
             }
             else {
                 $photo_detail='';
@@ -72,16 +68,12 @@ class ShowProductDetailController extends Controller
                 [
                     'errorCode'=>0,
                     'data'=>[
-                        'id'=>$productDetail->id, 
-                        'name'=>$productDetail->name,
+                        'id'=>$newsDetail->id, 
+                        'name'=>$newsDetail->name,
                         'photo'=>$photo_detail,
-                        'price'=>$productDetail->price,
-                        'id_list'=>$productDetail->id_list,
-                        'id_cat'=>$productDetail->id_cat,
-                        'content'=>$productDetail->content,
-                        'description'=>$productDetail->description,
-                        'files'=>$photo,
-                        'productRelate'=>$productDetail->productList
+                        'content'=>$newsDetail->content,
+                        'description'=>$newsDetail->description,
+                        'newsRelate'=>$News
                     ],
                     'status'=>200,
                 ], 200
