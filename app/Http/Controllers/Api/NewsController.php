@@ -45,6 +45,7 @@ class NewsController extends Controller
             'id'=>$pro->id, 
             'name'=>$pro->name,
             'is_status'=>$pro->is_status,
+            'hot'=>$pro->hot,
             'photo'=>URL::to('/').'/uploads/news/'.$pro->photo,
             ];
             array_push($data,$data_array);
